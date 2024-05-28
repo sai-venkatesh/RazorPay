@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'; // Assuming you create and import App.css for styling
 
+require('dotenv').config();
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
+
+
 const CreateSubscription = () => {
     const [formData, setFormData] = useState({
         plan_id: '',
@@ -17,7 +22,7 @@ const CreateSubscription = () => {
     useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/plans');
+                const response = await axios.get('${API_BASE_URL}/api/plans');
                 setPlans(response.data);
                 setLoading(false);
             } catch (error) {
@@ -41,14 +46,14 @@ const CreateSubscription = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/api/create-subscription', formData);
+            const response = await axios.post('${API_BASE_URL}/api/create-subscription', formData);
             alert('Subscription created successfully!');
             setSubscriptionId(response.data.id);
 
             const paymentWindow = window.open(response.data.short_url, '_blank');
 
             const pollSubscriptionStatus = setInterval(async () => {
-                const validateResponse = await axios.get(`http://localhost:5000/api/create-subscription/${response.data.id}`);
+                const validateResponse = await axios.get(`${API_BASE_URL}/api/create-subscription/${response.data.id}`);
                 const subscriptionStatus = validateResponse.data.status;
 
                 if (subscriptionStatus === "active") {
@@ -71,7 +76,7 @@ const CreateSubscription = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/api/cancel-subscription', {
+            const response = await axios.post('${API_BASE_URL}/api/cancel-subscription', {
                 subscription_id: subscriptionId
             });
             alert('Subscription cancelled successfully!');
